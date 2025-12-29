@@ -1,35 +1,34 @@
-import requests
-import time
+import telebot
+import datetime
 
-# بيانات Mohanad الأساسية
-API_KEY = "pfBfuOpYRz/P9DYeXrGmCQ==ts6KbiuJvatvBSrY"
-TOKEN = "8244331084:AAEFT5RyZFQtiWixKMIGPp1puczPXN-SpaE"
-CHAT_ID = "8372781252"
+# --- إعدادات البوت ---
+API_TOKEN = '7611986423:AAH_Ff6u6p7h9X4C9_wN3_qZ-mK4eR_xY' 
+USER_BALANCE = 1200  
+RISK_PER_TRADE = 0.01  
 
-# الرصيد اليدوي (تقدر تغيره في أي وقت من هنا)
-BALANCE = 1200 
+bot = telebot.TeleBot(API_TOKEN)
 
-def get_gold_price():
-    url = f'https://api.api-ninjas.com/v1/goldprice'
-    headers = {'X-Api-Key': API_KEY}
-    try:
-        response = requests.get(url, headers=headers)
-        if response.status_code == 200:
-            return response.json()['price']
-    except:
-        return None
-    return None
+def get_market_rating():
+    rating = 85  
+    if rating < 75:
+        return "unstable", rating
+    return "stable", rating
 
-def run_bot():
-    print(f"Bot started for Mohanad. Initial Balance: {BALANCE}")
-    while True:
-        price = get_gold_price()
-        if price:
-            # نظام التقييم (Rating System) قبل التنبيه
-            # إذا كان السوق غير مستقر يطبع:
-            # print("time not appropriate")
-            print(f"Current Gold Price: {price} - System Reviewing Conditions...")
-        time.sleep(60)
+def calculate_params(balance, risk_pc):
+    entry = 2650.00
+    tp = entry + 10.0
+    sl = entry - 5.0
+    lot = (balance * risk_pc) / 500
+    return entry, tp, sl, round(lot, 2)
 
-if name == "__main__":
-    run_bot()
+@bot.message_handler(commands=['start', 'check'])
+def handle_message(message):
+    status, rate = get_market_rating()
+    if status == "unstable":
+        bot.reply_to(message, f"⚠️ Current state: time not appropriate\nRating: {rate}%")
+    else:
+        entry, tp, sl, lot = calculate_params(USER_BALANCE, RISK_PER_TRADE)
+        msg = f"✅ **Market Stable**\n⭐ Rating: {rate}%\n---\n📈 Entry: {entry}\n🎯 TP: {tp}\n❌ SL: {sl}\n⚖️ Lot: {lot}"
+        bot.reply_to(message, msg, parse_mode='Markdown')
+
+bot.polling()
