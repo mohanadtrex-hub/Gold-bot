@@ -4,7 +4,7 @@ import pandas as pd
 # ملاحظة: حنستخدم منطق برمجي يحلل البيانات اللي توصل للبوت
 # الكود يعتمد على BALANCE يدوي زي ما طلبت [cite: 2025-12-29]
 
-API_TOKEN = '8244331084:AAEFT5RyZFQtIw'
+API_TOKEN = '8244331084:AAEfT5RyZFQtIwixKMIGPp1puczPXN-SpaE'
 BALANCE = 1200  # غيره يدوياً [cite: 2025-12-29]
 RISK_PER_TRADE = 0.01
 bot = telebot.TeleBot(API_TOKEN)
