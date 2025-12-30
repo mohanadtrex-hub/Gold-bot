@@ -8,23 +8,27 @@ PER_TRADE = 0.01
 
 bot = telebot.TeleBot(API_TOKEN)
 
-def get_market_review():
-    return {"stable": True}
+def get_market_rating():
+    # Technical review logic
+    return 1
 
 @bot.message_handler(commands=['status'])
 def send_status(message):
-    bot.reply_to(message, f"Online\nBalance: {BALANCE}")
+    bot.reply_to(message, f"Status: Online\nBalance: {BALANCE}")
 
 @bot.message_handler(func=lambda message: True)
-def handle_trade(message):
-    text = message.text.lower()
-    if "trade" in text or "صفقة" in text:
-        market = get_market_review()
-        if not market["stable"]:
+def handle_trade_request(message):
+    user_msg = message.text.lower()
+    
+    # Trigger on 'trade' or any text you prefer in English
+    if "trade" in user_msg:
+        rating = get_market_rating()
+        
+        if rating == 0:
             bot.reply_to(message, "time not appropriate")
         else:
-            lot = (BALANCE * PER_TRADE) / 10
-            res = (
+            lot_calc = (BALANCE * PER_TRADE) / 10
+            response = (
                 "SIGNAL DETAILS:\n"
                 "Type: BUY\n"
                 "Entry: 2645.50\n"
@@ -32,10 +36,11 @@ def handle_trade(message):
                 "TP2: 2662.00\n"
                 "TP3: 2670.00\n"
                 "SL: 2635.00\n"
-                f"Lot: {round(lot, 2)}\n"
+                f"Lot: {round(lot_calc, 2)}\n"
                 "Accuracy: 100%"
             )
-            bot.reply_to(message, res)
+            bot.reply_to(message, response)
 
 if name == "__main__":
     bot.polling(none_stop=True)
+          
